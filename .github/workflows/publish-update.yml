@@ -1,0 +1,30 @@
+name: Publish verified Scanflow update
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published release tag, for example v1.3.0
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: scanflow-update-feed
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || (!github.event.release.draft && !github.event.release.prerelease)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Verify APK and publish update feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: python3 scripts/prepare_update.py --repo "$GITHUB_REPOSITORY" --tag "$RELEASE_TAG" --publish
