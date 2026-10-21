@@ -15,15 +15,21 @@ CERTIFICATE = 'b629eb8b652f49814766f9bc231d7f9539528267c04aaaa4965b48b21ecca4b8'
 def run(*args):
     return subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
 
+def verify_signer_output(output):
+    # Android build-tools use both numbered and signature-scheme signer labels.
+    digests = re.findall(
+        r'^(?:Signer #\d+|V[234](?:\.\d+)? Signer:) certificate SHA-256 digest: ([a-fA-F0-9]{64})\s*$',
+        output, re.M)
+    if not digests or {v.lower() for v in digests} != {CERTIFICATE}:
+        raise ValueError(f'APK does not have the existing Scanflow signing certificate; found {digests}')
+
 def inspect(apk, repo, tag, build_tools):
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}', repo):
         raise ValueError('Invalid repository')
     if not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', tag):
         raise ValueError('Use a stable version tag such as v1.3.0')
     signatures = run(str(build_tools / 'apksigner'), 'verify', '--print-certs', str(apk))
-    digests = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-fA-F0-9]+)', signatures)
-    if [v.lower() for v in digests] != [CERTIFICATE]:
-        raise ValueError(f'APK signing certificate mismatch. Found: {digests}. Verified output: {signatures}')
+    verify_signer_output(signatures)
     badging = run(str(build_tools / 'aapt'), 'dump', 'badging', str(apk))
     package = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
     minimum = re.search(r"^sdkVersion:'(\d+)'", badging, re.M)
