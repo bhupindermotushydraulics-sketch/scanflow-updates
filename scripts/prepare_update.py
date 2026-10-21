@@ -23,7 +23,7 @@ def inspect(apk, repo, tag, build_tools):
     signatures = run(str(build_tools / 'apksigner'), 'verify', '--print-certs', str(apk))
     digests = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-fA-F0-9]+)', signatures)
     if [v.lower() for v in digests] != [CERTIFICATE]:
-        raise ValueError('APK does not have the existing Scanflow signing certificate')
+        raise ValueError(f'APK signing certificate mismatch. Found: {digests}. Verified output: {signatures}')
     badging = run(str(build_tools / 'aapt'), 'dump', 'badging', str(apk))
     package = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
     minimum = re.search(r"^sdkVersion:'(\d+)'", badging, re.M)
