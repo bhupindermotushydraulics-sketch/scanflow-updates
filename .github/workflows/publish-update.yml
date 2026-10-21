@@ -23,6 +23,8 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - name: Test release verification
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
       - name: Verify APK and publish update feed
         env:
           GH_TOKEN: ${{ github.token }}
