@@ -1,10 +1,10 @@
 {
   "format": 1,
   "packageName": "app.scanflow.mobile.preview",
-  "versionCode": 8,
-  "versionName": "1.4.1",
+  "versionCode": 10,
+  "versionName": "1.4.2",
   "minSdk": 26,
   "sizeBytes": 24070866,
-  "sha256": "76aa726d4b0dcd7b57f2b1b476ccdc21df376be8d347f200e8cd93001644b182",
-  "apkUrl": "https://github.com/bhupindermotushydraulics-sketch/scanflow-updates/releases/download/v1.4.1/Scanflow.apk"
+  "sha256": "564529b303b3a08461df9f58ee1205f3254ec514ab1152ba96fe0b3f1f61ccb1",
+  "apkUrl": "https://github.com/bhupindermotushydraulics-sketch/scanflow-updates/releases/download/v1.4.2/Scanflow.apk"
 }
